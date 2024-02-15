@@ -21,8 +21,6 @@ Toggles = {};
 Options = {};
 getgenv().Toggles = Toggles;
 getgenv().Options = Options;
-Toggles = Toggles;
-Options = Options;
 
 local Library = {
 	Registry = {};
