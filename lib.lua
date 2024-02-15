@@ -1,6 +1,6 @@
 local InputService = game:GetService('UserInputService');
 local TextService = game:GetService('TextService');
-local CoreGui = game:GetService('CoreGui');
+local CoreGui = services.CoreGui;
 local Teams = game:GetService('Teams');
 local Players = game:GetService('Players');
 local RunService = game:GetService('RunService')
@@ -8,7 +8,7 @@ local TweenService = game:GetService('TweenService');
 local RenderStepped = RunService.RenderStepped;
 local LocalPlayer = Players.LocalPlayer;
 local Mouse = LocalPlayer:GetMouse();
-
+local getgenv = getgenv or function() return {}; end;
 local ProtectGui = protectgui or (syn and syn.protect_gui) or (function() end);
 
 local ScreenGui = Instance.new('ScreenGui');
@@ -17,8 +17,8 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
-local Toggles = {};
-local Options = {};
+Toggles = {};
+Options = {};
 getgenv().Toggles = Toggles;
 getgenv().Options = Options;
 Toggles = Toggles;
@@ -2830,6 +2830,81 @@ do
 		Parent = KeybindContainer,
 	})
 
+	
+	local InfoLoggerOuter = Library:Create("Frame", {
+		AnchorPoint = Vector2.new(0, 0.5),
+		BorderColor3 = Color3.new(0, 0, 0),
+		Position = UDim2.new(0, 10, 0.5, 0),
+		Size = UDim2.new(0, 210, 0, 24),
+		Visible = false,
+		ZIndex = 100,
+		Parent = ScreenGui,
+	})
+
+	local InfoLoggerInner = Library:Create("Frame", {
+		BackgroundColor3 = Library.MainColor,
+		BorderColor3 = Library.OutlineColor,
+		BorderMode = Enum.BorderMode.Inset,
+		Size = UDim2.new(1, 0, 1, 0),
+		ZIndex = 101,
+		Parent = InfoLoggerOuter,
+	})
+
+	Library:AddToRegistry(InfoLoggerInner, {
+		BackgroundColor3 = "MainColor",
+		BorderColor3 = "OutlineColor",
+	}, true)
+
+	local InfoColorFrame = Library:Create("Frame", {
+		BackgroundColor3 = Library.AccentColor,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, 2),
+		ZIndex = 102,
+		Parent = InfoLoggerInner,
+	})
+
+	Library:AddToRegistry(InfoColorFrame, {
+		BackgroundColor3 = "AccentColor",
+	}, true)
+
+	local InfoLoggerLabel = Library:CreateLabel({
+		Size = UDim2.new(1, 0, 0, 20),
+		Position = UDim2.fromOffset(5, 2),
+		TextXAlignment = Enum.TextXAlignment.Left,
+
+		Text = "Info-logger",
+		ZIndex = 104,
+		Parent = InfoLoggerInner,
+	})
+
+	local InfoLoggerContainer = Library:Create("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, -20),
+		Position = UDim2.new(0, 0, 0, 20),
+		ZIndex = 1,
+		Parent = InfoLoggerInner,
+	})
+
+	Library:Create("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Parent = InfoLoggerContainer,
+	})
+
+	Library:Create("UIPadding", {
+		PaddingLeft = UDim.new(0, 5),
+		Parent = InfoLoggerContainer,
+	})
+
+	Library.InfoLoggerFrame = InfoLoggerOuter
+	Library.InfoLoggerContainer = InfoLoggerContainer
+	Library.InfoLoggerData = {
+		ContainerLabels = {},
+		BlacklistList = {},
+	}
+
+	Library:MakeDraggable(InfoLoggerOuter)
+
 	Library.KeybindFrame = KeybindOuter;
 	Library.KeybindContainer = KeybindContainer;
 	Library:MakeDraggable(KeybindOuter);
@@ -3611,6 +3686,61 @@ local function OnPlayerChange()
 		end;
 	end;
 end;
+
+function Library:SetInfoLoggerVisibility(Value)
+	Library.InfoLoggerFrame.Visible = Value
+end
+
+
+function Library:UpdateInfoLoggerSize()
+	local YSize = 0
+	local XSize = 0
+
+	for _, Label in next, Library.InfoLoggerContainer:GetChildren() do
+		if Label:IsA("TextLabel") and Label.Visible then
+			YSize = YSize + 18
+			if Label.TextBounds.X > XSize then
+				XSize = Label.TextBounds.X
+			end
+		end
+	end
+
+	Library.InfoLoggerFrame.Size = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
+end
+
+-- It's ugly but I don't care for anything proper right now
+function Library:AddTextToInfoLogger(Text)
+	local InfoContainerLabel = Library:CreateLabel({
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Size = UDim2.new(1, 0, 0, 18),
+		TextSize = 13,
+		Visible = false,
+		ZIndex = 110,
+		Parent = Library.InfoLoggerContainer,
+	}, true)
+
+	if (#Library.InfoLoggerData.ContainerLabels + 1) > 15 then
+		-- Get first element
+		local FirstElement = Library.InfoLoggerData.ContainerLabels[1]
+		if FirstElement then
+			-- Destroy the last element
+			FirstElement:Destroy()
+
+			-- Remove element from table
+			table.remove(Library.InfoLoggerData.ContainerLabels, 1)
+		end
+	end
+
+	InfoContainerLabel.Text = Text;
+
+	InfoContainerLabel.Visible = true
+	InfoContainerLabel.TextColor3 = Library.FontColor
+
+	Library.InfoLoggerData.ContainerLabels[#Library.InfoLoggerData.ContainerLabels + 1] = InfoContainerLabel
+	Library.RegistryMap[InfoContainerLabel].Properties.TextColor3 = "FontColor"
+	Library:UpdateInfoLoggerSize();
+end
+
 
 Players.PlayerAdded:Connect(OnPlayerChange);
 Players.PlayerRemoving:Connect(OnPlayerChange);
