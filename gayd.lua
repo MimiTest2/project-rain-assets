@@ -1225,61 +1225,55 @@ do
 		local Picking = false;
 
 		PickOuter.InputBegan:Connect(function(Input)
-			pcall(function()
-				if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
-					Picking = true;
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
+                pcall(function()
+				    Picking = true;
+				    DisplayLabel.Text = '';
+				    local Break;
+				    local Text = '';
+				    task.spawn(function()
+				    	pcall(function()
+				    		while (not Break) do
+				    			if Text == '...' then
+				    				Text = '';
+				    			end;
+				    			Text = Text .. '.';
+				    			DisplayLabel.Text = Text;
+				    			wait(0.4);
+				    		end;
+				    	end)
+				    end);
+				    wait(0.2);
+				    local Event;
+				    Event = InputService.InputBegan:Connect(function(Input)
+				    	local Key;
+                        local kc = Input.KeyCode;
+				    	if Input.UserInputType == Enum.UserInputType.Keyboard then
+				    		Key = Input.KeyCode.Name;
+                            if kc == Enum.KeyCode.Backspace or kc == Enum.KeyCode.Escape then
+                                Key = 'None'
+                                kc = Enum.KeyCode.Unknown;
+                                print("YES!! CHAIR STOP SHAKING")
 
-					DisplayLabel.Text = '';
-
-					local Break;
-					local Text = '';
-
-					task.spawn(function()
-						pcall(function()
-							while (not Break) do
-								if Text == '...' then
-									Text = '';
-								end;
-
-								Text = Text .. '.';
-								DisplayLabel.Text = Text;
-
-								wait(0.4);
-							end;
-						end)
-					end);
-
-					wait(0.2);
-
-					local Event;
-					Event = InputService.InputBegan:Connect(function(Input)
-						local Key;
-
-						if Input.UserInputType == Enum.UserInputType.Keyboard then
-							Key = Input.KeyCode.Name;
-						elseif Input.UserInputType == Enum.UserInputType.MouseButton1 then
-							Key = 'MB1';
-						elseif Input.UserInputType == Enum.UserInputType.MouseButton2 then
-							Key = 'MB2';
-						end;
-
-						Break = true;
-						Picking = false;
-
-						DisplayLabel.Text = Key;
-						KeyPicker.Value = Key;
-
-						Library:SafeCallback(KeyPicker.ChangedCallback, Input.KeyCode or Input.UserInputType)
-						Library:SafeCallback(KeyPicker.Changed, Input.KeyCode or Input.UserInputType)
-
-						Library:AttemptSave();
-
-						Event:Disconnect();
-					end);
-				elseif Input.UserInputType == Enum.UserInputType.MouseButton2 and not Library:MouseIsOverOpenedFrame() then
-					ModeSelectOuter.Visible = true;
-				end;
-			end);
+                            end;
+				    	elseif Input.UserInputType == Enum.UserInputType.MouseButton1 then
+				    		Key = 'MB1';
+				    	elseif Input.UserInputType == Enum.UserInputType.MouseButton2 then
+				    		Key = 'MB2';
+				    	end;
+				    	Break = true;
+				    	Picking = false;
+				    	DisplayLabel.Text = Key;
+				    	KeyPicker.Value = Key;
+				    	Library:SafeCallback(KeyPicker.ChangedCallback, kc or Input.UserInputType)
+				    	Library:SafeCallback(KeyPicker.Changed, kc or Input.UserInputType)
+				    	Library:AttemptSave();
+				    	Event:Disconnect();
+				    end);
+                end);
+			elseif Input.UserInputType == Enum.UserInputType.MouseButton2 and not Library:MouseIsOverOpenedFrame() then
+				ModeSelectOuter.Visible = true;
+			end;
 		end);
 
 		Library:GiveSignal(InputService.InputBegan:Connect(function(Input,t)
