@@ -1136,7 +1136,7 @@ local RenderStepped = RunService.RenderStepped;
                 end;
     
                 Label.InputBegan:Connect(function(Input)
-                    if Toggled and Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                         ModeButton:Select();
                         Library:AttemptSave();
                     end;
@@ -1232,7 +1232,7 @@ local RenderStepped = RunService.RenderStepped;
             local Picking = false;
     
             PickOuter.InputBegan:Connect(function(Input)
-                if Input.UserInputType == Enum.UserInputType.MouseButton1 and Toggled and not Library:MouseIsOverOpenedFrame() then
+                if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
                     pcall(function()
                         Picking = true;
                         DisplayLabel.Text = '';
