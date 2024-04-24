@@ -1404,7 +1404,7 @@ local RenderStepped = RunService.RenderStepped;
         end;
 
         function Label:SetColor(color)
-            TextLabel.Color = color;
+            TextLabel.TextColor3 = color;
         end;
 
         if (not DoesWrap) then
