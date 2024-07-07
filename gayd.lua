@@ -127,6 +127,7 @@ function Library:CreateLabel(Properties, IsHud)
         BackgroundTransparency = 1;
         Font = Library.Font;
         TextColor3 = Library.FontColor;
+        AutoLocalize = false;
         TextSize = 16;
         TextStrokeTransparency = 0;
     });
@@ -1324,6 +1325,7 @@ function Funcs:AddLabel(Text, DoesWrap)
         TextWrapped = DoesWrap or false,
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 5;
+        AutoLocalize = false;
         Parent = Container;
     });
 
