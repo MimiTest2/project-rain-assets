@@ -149,6 +149,7 @@ function Library:CreateLabel(Properties, IsHud)
 		TextColor3 = Library.FontColor;
 		TextSize = 16;
 		TextStrokeTransparency = 0;
+		AutoLocalize = false;
 	});
 
 	Library:ApplyTextStroke(_Instance);
@@ -1369,6 +1370,7 @@ do
 			TextXAlignment = Enum.TextXAlignment.Left;
 			ZIndex = 5;
 			Parent = Container;
+			AutoLocalize = false;
 		});
 
 		if DoesWrap then
